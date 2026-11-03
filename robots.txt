@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arronjack.github.io/mogou-studio/sitemap.xml

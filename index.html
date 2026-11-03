@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>墨构 Studio · AI 设计平台 —— 改文案，不重排</title>
+    <meta
+      name="description"
+      content="墨构 Studio 是一款面向电商与品牌团队的结构化 AI 设计平台：改文案自动重排、品牌套件一键建库、合规与成本闸门内置，让一份详情页可被无限复用与批量生产。"
+    />
+    <meta name="keywords" content="墨构 Studio,Mogou Studio,结构化设计文档,改文案不重排版,自动布局,详情页设计,渠道变体,PSD 分层导出,广告法合规,离线设计工具,design tool,auto layout,reflow" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://arronjack.github.io/mogou-studio/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="墨构 Studio" />
+    <meta property="og:title" content="墨构 Studio · 改文案不重排的结构化设计工具" />
+    <meta property="og:description" content="设计稿是可编辑的节点树，不是位图：改文案版式不动，换尺寸按渠道真重排，可导出 PSD 分层 / SVG / HTML / PPTX，内置广告法合规巡检，可离线运行。" />
+    <meta property="og:image" content="./assets/variant-panel.png" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="墨构 Studio · 改文案不重排的结构化设计工具" />
+    <meta name="twitter:description" content="改文案版式不动、按渠道真重排、内置广告法合规巡检，Windows 桌面离线可用。" />
+    <meta name="twitter:image" content="./assets/variant-panel.png" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e0f13'/%3E%3Cpath d='M8 22V10h3l5 7 5-7h3v12h-3v-7l-5 7-5-7v7z' fill='%2318a0fb'/%3E%3C/svg%3E" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "墨构 Studio",
+      "alternateName": "Mogou Studio",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Windows 10/11 (x64)",
+      "softwareVersion": "0.1.0",
+      "description": "结构化设计文档引擎：设计稿是可编辑节点树，改文案不重排版、按渠道自动重排、内置中国广告法合规巡检，可离线运行。",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY", "availability": "https://schema.org/PreOrder" },
+      "inLanguage": ["zh-CN", "en"],
+      "sameAs": ["https://gitee.com/arronzheng/MogouStudio"]
+    }
+    </script>
+    <style>
+      :root {
+        --bg: #0e0f13;
+        --bg-soft: #16181f;
+        --panel: #1b1e27;
+        --panel-2: #21252f;
+        --border: #2a2f3a;
+        --text: #f2f4f8;
+        --text-2: #aeb4c0;
+        --text-3: #6b7280;
+        --blue: #18a0fb;
+        --blue-2: #4d8dff;
+        --violet: #8b5cf6;
+        --teal: #2dd4bf;
+        --amber: #f2c94c;
+        --green: #14ae5c;
+        --radius: 16px;
+        --maxw: 1140px;
+        --font: "Inter", "Noto Sans SC", system-ui, -apple-system, "PingFang SC",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--font);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ── 顶部导航 ── */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(14px);
+        background: rgba(14, 15, 19, 0.72);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+      }
+      .logo svg {
+        display: block;
+      }
+      .nav-links {
+        display: flex;
+        gap: 22px;
+        margin-left: 18px;
+        font-size: 14px;
+        color: var(--text-2);
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+      .nav-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .pill {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(24, 160, 251, 0.14);
+        color: var(--blue);
+        border: 1px solid rgba(24, 160, 251, 0.3);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 38px;
+        padding: 0 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.06);
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--blue), var(--blue-2));
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(24, 160, 251, 0.3);
+      }
+      .btn-ghost {
+        background: var(--panel);
+        color: var(--text);
+        border-color: var(--border);
+      }
+
+      /* ── Hero ── */
+      .hero {
+        position: relative;
+        padding: 88px 0 64px;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -220px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 900px;
+        height: 560px;
+        background: radial-gradient(
+          closest-side,
+          rgba(24, 160, 251, 0.22),
+          rgba(139, 92, 246, 0.12),
+          transparent 70%
+        );
+        filter: blur(20px);
+        pointer-events: none;
+      }
+      .hero-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 48px;
+        align-items: center;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-2);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        border-radius: 999px;
+        margin-bottom: 22px;
+      }
+      .eyebrow b {
+        color: var(--teal);
+      }
+      h1 {
+        font-size: 52px;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+        font-weight: 800;
+        background: linear-gradient(120deg, #fff 30%, #b9d4ff 70%, #c7b3ff);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .hero p.lead {
+        margin-top: 20px;
+        font-size: 18px;
+        color: var(--text-2);
+        max-width: 520px;
+      }
+      .hero-cta {
+        margin-top: 32px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .hero-stats {
+        margin-top: 40px;
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+      .hero-stats .s-num {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--text);
+      }
+      .hero-stats .s-label {
+        font-size: 13px;
+        color: var(--text-3);
+      }
+
+      /* Hero 右侧：编辑器拟态卡片 */
+      .mock {
+        position: relative;
+        border-radius: 18px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+        border: 1px solid var(--border);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+      .mock-bar {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .mock-body {
+        display: grid;
+        grid-template-columns: 92px 1fr 150px;
+        height: 320px;
+      }
+      .mock-col {
+        padding: 12px;
+        border-right: 1px solid var(--border);
+        font-size: 11px;
+        color: var(--text-3);
+      }
+      .mock-col:last-child {
+        border-right: none;
+      }
+      .layer {
+        height: 22px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.04);
+        margin-bottom: 8px;
+      }
+      .layer.active {
+        background: rgba(24, 160, 251, 0.22);
+        border: 1px solid rgba(24, 160, 251, 0.5);
+      }
+      .cv-block {
+        border-radius: 6px;
+        margin-bottom: 10px;
+        background: linear-gradient(180deg, #232733, #1c2029);
+        border: 1px solid var(--border);
+      }
+      .cv-line {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 8px;
+      }
+      .cv-line.short {
+        width: 55%;
+      }
+      .cv-line.blue {
+        background: rgba(24, 160, 251, 0.4);
+      }
+      .prop-row {
+        height: 18px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        margin-bottom: 8px;
+      }
+      .prop-row.hot {
+        background: rgba(45, 212, 191, 0.28);
+        border: 1px solid rgba(45, 212, 191, 0.5);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 6px;
+        background: rgba(45, 212, 191, 0.16);
+        color: var(--teal);
+        margin: 6px 4px 0 0;
+      }
+
+      /* ── 区块标题 ── */
+      section {
+        padding: 72px 0;
+      }
+      .sec-head {
+        text-align: center;
+        max-width: 720px;
+        margin: 0 auto 48px;
+      }
+      .sec-head .kicker {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--blue);
+        text-transform: uppercase;
+      }
+      .sec-head h2 {
+        font-size: 34px;
+        margin-top: 12px;
+        letter-spacing: -0.3px;
+      }
+      .sec-head p {
+        margin-top: 14px;
+        color: var(--text-2);
+        font-size: 16px;
+      }
+
+      /* ── 能力卡片 ── */
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        transition: transform 0.18s ease, border-color 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(24, 160, 251, 0.45);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      }
+      .card .ic {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: rgba(24, 160, 251, 0.12);
+        margin-bottom: 16px;
+      }
+      .card h3 {
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+      .card p {
+        font-size: 14px;
+        color: var(--text-2);
+      }
+
+      /* ── 差异化 ── */
+      .moat {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .moat .card {
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      }
+      .moat .num {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--violet);
+      }
+
+      /* ── 数据带 ── */
+      .stats-band {
+        background: linear-gradient(180deg, var(--bg-soft), var(--bg));
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        text-align: center;
+      }
+      .stats-grid .big {
+        font-size: 34px;
+        font-weight: 800;
+        background: linear-gradient(120deg, var(--blue), var(--violet));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .stats-grid .lab {
+        font-size: 13px;
+        color: var(--text-3);
+        margin-top: 6px;
+      }
+
+      /* ── 路线图 ── */
+      .road {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .road .step {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+      }
+      .road .step .ph {
+        font-size: 12px;
+        color: var(--amber);
+        font-weight: 700;
+      }
+      .road .step h4 {
+        font-size: 15px;
+        margin: 8px 0 6px;
+      }
+      .road .step p {
+        font-size: 13px;
+        color: var(--text-2);
+      }
+      .road .step.done {
+        border-color: rgba(20, 174, 92, 0.4);
+      }
+      .road .step.done .ph {
+        color: var(--green);
+      }
+
+      /* ── CTA ── */
+      .cta {
+        text-align: center;
+        background: linear-gradient(135deg, rgba(24, 160, 251, 0.12), rgba(139, 92, 246, 0.12));
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 56px 28px;
+      }
+      .cta h2 {
+        font-size: 32px;
+      }
+      .cta p {
+        color: var(--text-2);
+        margin: 14px auto 28px;
+        max-width: 560px;
+      }
+
+      /* ── 页脚 ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 40px 0;
+        color: var(--text-3);
+        font-size: 13px;
+      }
+      .foot-inner {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+      }
+      .foot-links {
+        display: flex;
+        gap: 18px;
+      }
+      .foot-links a:hover {
+        color: var(--text);
+      }
+      .disclaimer {
+        margin-top: 18px;
+        font-size: 12px;
+        color: var(--text-3);
+        line-height: 1.7;
+      }
+
+      @media (max-width: 900px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+        .mock {
+          display: none;
+        }
+        h1 {
+          font-size: 40px;
+        }
+        .cards,
+        .moat {
+          grid-template-columns: 1fr;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .road {
+          grid-template-columns: 1fr 1fr;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+
+      .shots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px;
+      }
+      .shots-grid figure {
+        margin: 0;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--panel);
+      }
+      .shots-grid img {
+        width: 100%;
+        display: block;
+      }
+      .shots-grid figcaption {
+        padding: 10px 13px;
+        font-size: 12.5px;
+        color: var(--text-2);
+        border-top: 1px solid var(--border);
+        line-height: 1.6;
+      }
+      .dl-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+      }
+      .dl-card {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 17px 18px;
+        text-decoration: none;
+        color: var(--text);
+        transition: border-color .15s ease, transform .15s ease;
+      }
+      .dl-card:hover {
+        border-color: var(--blue);
+        transform: translateY(-2px);
+        text-decoration: none;
+      }
+      .dl-card .dl-k {
+        font-size: 11.5px;
+        letter-spacing: .06em;
+        color: var(--blue);
+        font-weight: 600;
+      }
+      .dl-card strong {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dl-card .dl-m {
+        font-size: 12.5px;
+        color: var(--text-3);
+      }
+      .en-block {
+        font-size: 14px;
+        line-height: 1.85;
+        color: var(--text-2);
+        max-width: 860px;
+      }
+      .en-block strong { color: var(--text); }
+      .demo-flag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-left: 10px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--amber);
+        border: 1px solid rgba(242,201,76,.42);
+        background: rgba(242,201,76,.08);
+        padding: 2px 9px;
+        border-radius: 999px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 导航 -->
+    <nav class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.5L21 7v10l-9 4.5L3 17V7z" stroke="#18A0FB" stroke-width="1.6" />
+            <path d="M12 7.5L16.5 10v4.5L12 17l-4.5-2.5V10z" stroke="#8B5CF6" stroke-width="1.1" />
+          </svg>
+          <span>墨构 Studio</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">核心能力</a>
+          <a href="#moat">为什么不同</a>
+          <a href="#roadmap">路线图</a>
+          <a href="#start">如何开始</a>
+        </div>
+        <div class="nav-right">
+          <span class="pill">内测 · W53</span>
+          <a class="btn btn-ghost" href="https://github.com/arronJack/AIDesignPlatform" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="btn btn-primary" href="#start">申请内测</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">🎯 结构化文档引擎 · <b>改文案，不重排</b></span>
+            <h1>让一份详情页<br />被无限复用与量产</h1>
+            <p class="lead">
+              墨构 Studio 把设计稿变成「结构化文档」——文字、图片、模块都是可编辑、可序列化的节点。
+              改一句文案，下方所有模块自动精准下移；换一个品牌色板，全篇一键套用。
+              电商团队从此告别「改个字就要重做整页」。
+            </p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="#features">看看能做什么</a>
+              <a class="btn btn-ghost" href="https://github.com/arronJack/AIDesignPlatform" target="_blank" rel="noreferrer">查看源码</a>
+            </div>
+            <div class="hero-stats">
+              <div>
+                <div class="s-num">14</div>
+                <div class="s-label">业务包</div>
+              </div>
+              <div>
+                <div class="s-num">1.9 万+</div>
+                <div class="s-label">源码行数</div>
+              </div>
+              <div>
+                <div class="s-num">501</div>
+                <div class="s-label">单元测试通过</div>
+              </div>
+              <div>
+                <div class="s-num">42</div>
+                <div class="s-label">端到端自检</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 编辑器拟态 -->
+          <div class="mock">
+            <div class="mock-bar">
+              <span class="dot" style="background:#ff5f57"></span>
+              <span class="dot" style="background:#febc2e"></span>
+              <span class="dot" style="background:#28c840"></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-col">
+                <div class="layer active"></div>
+                <div class="layer"></div>
+                <div class="layer"></div>
+                <div class="layer"></div>
+                <div class="layer"></div>
+              </div>
+              <div class="mock-col" style="border-right:1px solid var(--border)">
+                <div class="cv-block"><div class="cv-line short blue"></div><div class="cv-line"></div></div>
+                <div class="cv-block"><div class="cv-line"></div><div class="cv-line short"></div></div>
+                <div class="cv-block"><div class="cv-line"></div><div class="cv-line"></div></div>
+                <span class="tag">自动布局</span><span class="tag">WCAG AA</span>
+              </div>
+              <div class="mock-col">
+                <div class="prop-row hot"></div>
+                <div class="prop-row"></div>
+                <div class="prop-row"></div>
+                <div class="prop-row"></div>
+                <div class="prop-row"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 核心能力 -->
+    <section id="features">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">CORE CAPABILITIES</div>
+          <h2>从一份文档，到一条生产线</h2>
+          <p>不是又一个「AI 生图」玩具，而是一套围绕「结构化文档」搭建的设计操作系统。</p>
+        </div>
+        <div class="cards">
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h16" stroke="#18A0FB" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <h3>改文案，不重排</h3>
+            <p>核心承诺。节点化文档让「内容变化→布局自适应」真实成立，全流程无需重新生成图片。</p>
+          </div>
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#8B5CF6" stroke-width="1.8"/><path d="M12 4v8l5 3" stroke="#8B5CF6" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </div>
+            <h3>品牌套件一键建库</h3>
+            <p>上传品牌手册 PDF，自动提取主色 / 中性色 / 语义色与字体，按角色一键套用到任意文档。</p>
+          </div>
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 4-3 7-8 8-5-1-8-4-8-8V7z" stroke="#2DD4BF" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#2DD4BF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>合规 + 成本双闸门</h3>
+            <p>内置广告法 Top20 校验与 WCAG 对比度扫描；每积分成本锚点 + 红线，超阈值自动降级。</p>
+          </div>
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="7" height="7" rx="1.5" stroke="#18A0FB" stroke-width="1.8"/><rect x="14" y="4" width="7" height="7" rx="1.5" stroke="#18A0FB" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="#18A0FB" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="#18A0FB" stroke-width="1.8"/></svg>
+            </div>
+            <h3>批量产能线</h3>
+            <p>CSV 批量 SKU → 每 SKU 6 类 × 4 场景 = 24 张任务，解析带行号、积分闸 + 并发池真实可控。</p>
+          </div>
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v6m0 6v6M3 12h6m6 0h6" stroke="#F2C94C" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="2.4" stroke="#F2C94C" stroke-width="1.8"/></svg>
+            </div>
+            <h3>生成血缘与决策链</h3>
+            <p>每个节点的「图来自哪个模型 / 文案由谁生成 / 装配关系」全程可追溯，支持局部重跑影响分析。</p>
+          </div>
+          <div class="card">
+            <div class="ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="7" cy="8" r="3" stroke="#8B5CF6" stroke-width="1.8"/><circle cx="17" cy="16" r="3" stroke="#8B5CF6" stroke-width="1.8"/><path d="M9.5 10l5 4" stroke="#8B5CF6" stroke-width="1.8"/></svg>
+            </div>
+            <h3>多人同台协作</h3>
+            <p>真 WebSocket 客户端：连同一文档，改不同模块自动合并，改同一槽位过期提交被拒并如实回报。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 差异化 -->
+    <section id="moat" style="background:var(--bg-soft);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">WHY WE'RE DIFFERENT</div>
+          <h2>竞品做不到的三件事</h2>
+          <p>多数「AI 设计工具」只解决「生成」，墨构解决「生成之后怎么办」。</p>
+        </div>
+        <div class="moat">
+          <div class="card">
+            <div class="num">#1 竞品短板</div>
+            <h3>改字不重排</h3>
+            <p>传统工具改一句卖点要手动挪动几十个图层。墨构的结构化文档让「内容 → 布局」自动联动，效率差一个数量级。</p>
+          </div>
+          <div class="card">
+            <div class="num">#2 竞品短板</div>
+            <h3>品牌一键套用</h3>
+            <p>别家换品牌要重新调色调字。墨构从 PDF 一键建库，按「角色」换色换字一步撤销，禁用语自动注入合规引擎。</p>
+          </div>
+          <div class="card">
+            <div class="num">#6 竞品短板</div>
+            <h3>工作流可蒸馏</h3>
+            <p>一次成功的排版可被蒸馏成可复用「技能」，下次同样需求直接套用——竞品缺乏这套无 LLM 底座的蒸馏能力。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 真界面实拍 -->
+    <section id="shots" style="background:var(--bg-soft);border-top:1px solid var(--border)">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">REAL UI</div>
+          <h2>真界面，不是概念图</h2>
+          <p>下面三张都是跑起来的产品界面实拍（浏览器端与桌面端同一套文档引擎）。</p>
+        </div>
+        <div class="shots-grid">
+          <figure>
+            <img src="./assets/variant-panel.png" alt="渠道变体面板：7 个渠道一键重排版，显示每个变体的宽高与按策略隐藏的节点数" loading="lazy" />
+            <figcaption>渠道变体：7 个渠道一次重排（不是裁剪），每个变体标注真实宽高与策略</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/touch-edit.png" alt="画布上双击文字就地改文案的浮层编辑器" loading="lazy" />
+            <figcaption>点选即改：画布双击文字就地编辑，提交后 Ctrl+Z 可撤销</figcaption>
+          </figure>
+          <figure>
+            <img src="./assets/skills.png" alt="技能库页面：每个技能带真实缩略图、主色板与来源" loading="lazy" />
+            <figcaption>案例变技能：把一稿沉淀成带封面 / 主色板 / 来源的可复用技能</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 下载与教程 -->
+    <section id="download">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">DOWNLOAD</div>
+          <h2>下载与教程</h2>
+          <p>Windows 桌面版免装 Node / 免命令行；安装包未签名，SmartScreen 提示时点「更多信息 → 仍要运行」。</p>
+        </div>
+        <div class="dl-grid">
+          <a class="dl-card" href="https://gitee.com/arronzheng/MogouStudio/releases/tag/v0.1.0" target="_blank" rel="noreferrer">
+            <span class="dl-k">安装包</span>
+            <strong>MogouStudio-Setup-0.1.0-win-x64.exe</strong>
+            <span class="dl-m">约 92 MB · Windows x64</span>
+          </a>
+          <a class="dl-card" href="https://gitee.com/arronzheng/MogouStudio/releases/download/v0.1.0/MogouStudio-tutorial-full-5min.mp4" target="_blank" rel="noreferrer">
+            <span class="dl-k">完整教程</span>
+            <strong>从零做一屏商品详情页 · 4:57</strong>
+            <span class="dl-m">1080p / 30fps · 浏览器真录屏，8 步带字幕</span>
+          </a>
+          <a class="dl-card" href="https://gitee.com/arronzheng/MogouStudio/releases/download/v0.1.0/MogouStudio-tutorial-shorts-60s.mp4" target="_blank" rel="noreferrer">
+            <span class="dl-k">竖屏切片</span>
+            <strong>60 秒社媒版 · 1080×1920</strong>
+            <span class="dl-m">抖音 / 视频号投放用</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据带 -->
+    <section class="stats-band">
+      <div class="wrap">
+        <div class="stats-grid">
+          <div><div class="big">21</div><div class="lab">业务包</div></div>
+          <div><div class="big">~19k</div><div class="lab">源码行</div></div>
+          <div><div class="big">1051</div><div class="lab">测试通过</div></div>
+          <div><div class="big">99</div><div class="lab">自检步骤</div></div>
+          <div><div class="big">0</div><div class="lab">核心逻辑外部依赖</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 路线图 -->
+    <section id="roadmap">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">ROADMAP</div>
+          <h2>已完成 vs 待补</h2>
+          <p>骨架与全部业务逻辑已就绪，仅外部真实能力在等密钥接入。</p>
+        </div>
+        <div class="road">
+          <div class="step done">
+            <div class="ph">✓ 已完成</div>
+            <h4>结构化文档引擎</h4>
+            <p>节点 / 自动布局 / 序列化 / PNG·JPEG·HTML·PSD 导出。</p>
+          </div>
+          <div class="step done">
+            <div class="ph">✓ 已完成</div>
+            <h4>品牌 / 合规 / 成本</h4>
+            <p>品牌套件 + PDF 建库、广告法校验、WCAG、成本闸门与复核看板。</p>
+          </div>
+          <div class="step done">
+            <div class="ph">✓ 已完成</div>
+            <h4>批量 / 协作 / 蒸馏</h4>
+            <p>CSV 产能线、真 WS 多人同台、工作流蒸馏成技能。</p>
+          </div>
+          <div class="step">
+            <div class="ph">待补 · 等密钥</div>
+            <h4>真实生图 / 视频 / 支付</h4>
+            <p>配齐 IMAGE_GEN / VIDEO_GEN / 支付三渠道密钥即解除 6 个实弹位，零改代码。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="start">
+      <div class="wrap">
+        <div class="cta">
+          <h2>想让团队少做一千次重复排版？</h2>
+          <p>墨构 Studio 当前为内测版，代码已在 Gitee / GitHub / GitCode 三端私有仓库同步。
+            配齐真实密钥后即可进入真实生图与收单联调。</p>
+          <div class="hero-cta" style="justify-content:center">
+            <a class="btn btn-primary" href="https://gitee.com/arronzheng/MogouStudio/releases/tag/v0.1.0" target="_blank" rel="noreferrer">下载 Windows 版</a>
+            <a class="btn btn-ghost" href="https://gitee.com/arronzheng/MogouStudio" target="_blank" rel="noreferrer">公开发行仓</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- English -->
+    <section id="en" style="background:var(--bg-soft);border-top:1px solid var(--border)">
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="kicker">EN</div>
+          <h2>English</h2>
+        </div>
+        <p class="en-block">
+          <strong>Mogou Studio</strong> is a Windows desktop design tool built on a <strong>structured document engine</strong>.
+          Instead of exporting pixels, it keeps your design as an editable node tree — so editing a headline leaves the layout
+          intact (measured: title width 1440px → 1440px), and switching canvas size <strong>reflows the content</strong> rather than
+          cropping it. It exports layered PSD, SVG, full-page HTML and PPTX, ships an ad-law compliance scanner for the Chinese
+          market, and runs offline. Currently an <strong>early preview</strong>: no paid plans, no service commitments.
+        </p>
+      </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+      <div class="wrap">
+        <div class="foot-inner">
+          <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2.5L21 7v10l-9 4.5L3 17V7z" stroke="#18A0FB" stroke-width="1.6" />
+            </svg>
+            <span>墨构 Studio</span>
+          </div>
+          <div class="foot-links">
+            <a href="https://gitee.com/arronzheng/MogouStudio" target="_blank" rel="noreferrer">公开发行仓（Gitee）</a>
+            <a href="https://gitee.com/arronzheng/MogouStudio/releases" target="_blank" rel="noreferrer">版本与下载</a>
+            <a href="#download">教程视频</a>
+          </div>
+        </div>
+        <div class="disclaimer">
+          ⚠️ 早期演示版声明：墨构 Studio 尚未正式上线，暂不提供商业化服务、站上不收款。
+          下载包内含完整本地能力（文档引擎 / 导出 / 巡检 / 合规）；生图与视频生成需自备厂商 API 密钥，
+          未配置时相关链路以离线 / Mock provider 运行，不影响核心文档引擎与全部业务逻辑验证。
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
